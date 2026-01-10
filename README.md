@@ -19,6 +19,7 @@ Omni-LLM Orchestrator is an intelligent multi-model orchestration system that au
 - **⚖️ Weighted Synthesis**: Trust scores (0.0-1.0) ensure domain experts have more influence
 - **💰 Cost Optimization**: Only 2-4 relevant models called per query, reducing costs by 60-80%
 - **🔒 Secure**: Zero hardcoded API keys, all credentials managed via environment variables
+- **🛡️ Prompt Injection Protection**: Multi-layer defense against jailbreaks, role hijacking, and extraction attacks
 - **🚀 Production-Ready**: Built with React 19, tRPC 11, Express 4, and Tailwind 4
 
 ---
@@ -169,6 +170,28 @@ omni-llm-orchestrator/
 │   └── schema.ts
 └── shared/                 # Shared types & constants
 ```
+
+---
+
+## 🛡️ Security
+
+This orchestrator implements comprehensive security measures to protect against prompt injection and other attacks:
+
+- **Input Sanitization**: Blocks malicious patterns before LLM processing
+- **Defensive System Prompts**: Instructs LLMs to resist manipulation attempts
+- **Output Validation**: Prevents credential leaks in responses
+- **Rate Limiting**: 100 requests per 15 minutes per user/IP
+- **Cost Controls**: Limits token usage (5,000 chars, 4,000 input tokens, 2,000 output tokens)
+
+See [SECURITY.md](./SECURITY.md) for complete security documentation and [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) for vulnerability analysis.
+
+### Running Security Tests
+
+```bash
+pnpm test -- security.test.ts
+```
+
+43 test cases validate all security measures against various attack vectors.
 
 ---
 

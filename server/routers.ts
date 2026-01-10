@@ -7,6 +7,14 @@ import { TRPCError } from "@trpc/server";
 import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
+import {
+  sanitizeQuery,
+  validateResponse,
+  getSystemPrompt,
+  checkRateLimit,
+  getUserIdentifier,
+  checkCostLimits,
+} from "./security";
 
 // Load routing configuration
 const routingConfigPath = path.join(process.cwd(), "client/public/routing.yaml");
@@ -40,11 +48,21 @@ export const appRouter = router({
     // Classify user intent using Cohere
     classifyIntent: publicProcedure
       .input(z.object({
-        query: z.string(),
+        query: z.string().min(1).max(5000),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { query } = input;
-        
+
+        // Security: Rate limiting
+        const userIdentifier = getUserIdentifier(ctx.req);
+        checkRateLimit(userIdentifier, 100, 15 * 60 * 1000);
+
+        // Security: Sanitize input
+        const sanitizedQuery = sanitizeQuery(query);
+
+        // Security: Check cost limits
+        checkCostLimits(sanitizedQuery, 4000);
+
         if (!process.env.COHERE_API_KEY) {
           return { intent: "general", confidence: 0.5 };
         }
@@ -57,7 +75,7 @@ export const appRouter = router({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              inputs: [query],
+              inputs: [sanitizedQuery],
               examples: [
                 { text: "Write a Python function", label: "coding" },
                 { text: "Debug this JavaScript error", label: "coding" },
@@ -120,12 +138,22 @@ export const appRouter = router({
     // Orchestrate query across multiple models
     orchestrate: publicProcedure
       .input(z.object({
-        query: z.string(),
+        query: z.string().min(1).max(5000),
         intent: z.string().optional(),
         selectedModel: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { query, intent: providedIntent, selectedModel } = input;
+
+        // Security: Rate limiting
+        const userIdentifier = getUserIdentifier(ctx.req);
+        checkRateLimit(userIdentifier, 100, 15 * 60 * 1000);
+
+        // Security: Sanitize input
+        const sanitizedQuery = sanitizeQuery(query);
+
+        // Security: Check cost limits
+        checkCostLimits(sanitizedQuery, 4000);
 
         if (!process.env.OPENROUTER_API_KEY) {
           throw new TRPCError({
@@ -137,6 +165,9 @@ export const appRouter = router({
         // If specific model selected, use that
         if (selectedModel && selectedModel !== "auto") {
           try {
+            // Security: Add defensive system prompt
+            const systemPrompt = getSystemPrompt("manual");
+
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
               method: "POST",
               headers: {
@@ -147,8 +178,10 @@ export const appRouter = router({
               body: JSON.stringify({
                 model: selectedModel,
                 messages: [
-                  { role: "user", content: query }
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: sanitizedQuery }
                 ],
+                max_tokens: 2000,  // Security: Limit output tokens
               }),
             });
 
@@ -157,8 +190,13 @@ export const appRouter = router({
             }
 
             const data = await response.json();
+            const rawResponse = data.choices[0]?.message?.content || "No response generated";
+
+            // Security: Validate response for leaks
+            const safeResponse = validateResponse(rawResponse);
+
             return {
-              response: data.choices[0]?.message?.content || "No response generated",
+              response: safeResponse,
               model: selectedModel,
               intent: "manual",
             };
@@ -173,7 +211,7 @@ export const appRouter = router({
 
         // Auto mode: classify intent and use weighted routing
         const intent = providedIntent || "general";
-        
+
         if (!routingConfig) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -187,6 +225,9 @@ export const appRouter = router({
         // Call top model based on weight
         const topModel = models.sort((a: any, b: any) => b.weight - a.weight)[0];
 
+        // Security: Add intent-specific defensive system prompt
+        const systemPrompt = getSystemPrompt(intent);
+
         try {
           const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
@@ -198,8 +239,10 @@ export const appRouter = router({
             body: JSON.stringify({
               model: topModel.id,
               messages: [
-                { role: "user", content: query }
+                { role: "system", content: systemPrompt },
+                { role: "user", content: sanitizedQuery }
               ],
+              max_tokens: 2000,  // Security: Limit output tokens
             }),
           });
 
@@ -208,8 +251,13 @@ export const appRouter = router({
           }
 
           const data = await response.json();
+          const rawResponse = data.choices[0]?.message?.content || "No response generated";
+
+          // Security: Validate response for leaks
+          const safeResponse = validateResponse(rawResponse);
+
           return {
-            response: data.choices[0]?.message?.content || "No response generated",
+            response: safeResponse,
             model: topModel.id,
             intent,
             synthesis: {
