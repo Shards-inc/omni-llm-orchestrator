@@ -301,7 +301,7 @@ Contributions welcome! Please open an issue or submit a pull request.
 
 ## 📧 Contact
 
-Built by Sunil Singh · Powered by OpenRouter
+Built by Ayai Singh · Powered by OpenRouter
 
 **Live Demo**: [https://omni-llm-orchestrator.manus.space](https://omni-llm-orchestrator.manus.space)
 
