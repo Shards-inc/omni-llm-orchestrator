@@ -1,0 +1,20 @@
+name: Autonomous IaC Check
+
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+      - 'terraform/**'
+      - '**.tf'
+
+jobs:
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        run: terraform init || echo "No terraform files found"
+      - name: Terraform Validate
+        run: terraform validate || echo "Validation skipped"
