@@ -1,0 +1,21 @@
+name: Autonomous Release
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore:') && !contains(github.event.head_commit.message, 'docs:')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
