@@ -1,0 +1,35 @@
+name: Autonomous Docker Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  docker:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for Dockerfile
+        id: check_file
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.check_file.outputs.exists == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        if: steps.check_file.outputs.exists == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: user/app:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
