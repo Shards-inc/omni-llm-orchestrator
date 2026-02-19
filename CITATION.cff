@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Shards-inc"
+  given-names: "Ayai"
+title: "omni-llm-orchestrator"
+version: 1.0.0
+date-released: 2026-02-19
+url: "https://github.com/Shards-inc/omni-llm-orchestrator"
