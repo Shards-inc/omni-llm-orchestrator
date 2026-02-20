@@ -270,8 +270,8 @@ importers:
         specifier: ^7.1.11
         version: 7.1.11(@types/node@24.7.0)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)
       vite-plugin-manus-runtime:
-        specifier: ^0.0.52
-        version: 0.0.52
+        specifier: ^0.0.57
+        version: 0.0.57
       vitest:
         specifier: ^2.1.4
         version: 2.1.9(@types/node@24.7.0)(lightningcss@1.30.1)
@@ -2959,8 +2959,8 @@ packages:
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
-  modern-screenshot@4.6.6:
-    resolution: {integrity: sha512-8tF0xEpe7yx37mK95UcIghSCWYeu628K2hLJl+ZNY2ANmRzYLlRLpquPHAQcL8keF6BoeEzTEw4GrgmUpGuZ8w==}
+  modern-screenshot@4.6.8:
+    resolution: {integrity: sha512-GJkv/yWPOJTlxj1LZDU2k474cDyOWL+LVaqTdDWQwQ5d8zIuTz1892+1cV9V0ZpK6HYZFo/+BNLBbierO9d2TA==}
 
   motion-dom@12.23.21:
     resolution: {integrity: sha512-5xDXx/AbhrfgsQmSE7YESMn4Dpo6x5/DTZ4Iyy4xqDvVHWvFVoV+V2Ri2S/ksx+D40wrZ7gPYiMWshkdoqNgNQ==}
@@ -3401,8 +3401,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-manus-runtime@0.0.52:
-    resolution: {integrity: sha512-1iaVk0N/1PFmFZKb9fXHYRYiE05umjnhy+A5z0izJjgekYe7rCjkq98ytU5g5E9vrHrx5ZoOW03KQE8lIMOL2g==}
+  vite-plugin-manus-runtime@0.0.57:
+    resolution: {integrity: sha512-AqJm43Mq/zA3nFdwRxAzsyXYy+YPPHa0oUPlWSge0f+zUBxKoDQj3kUB/61I1yEUD0ap7YSkRxmk09FCaSErtw==}
 
   vite@5.4.21:
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
@@ -6379,7 +6379,7 @@ snapshots:
 
   mitt@3.0.1: {}
 
-  modern-screenshot@4.6.6: {}
+  modern-screenshot@4.6.8: {}
 
   motion-dom@12.23.21:
     dependencies:
@@ -6831,11 +6831,11 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-manus-runtime@0.0.52:
+  vite-plugin-manus-runtime@0.0.57:
     dependencies:
       '@medv/finder': 4.0.2
       clsx: 2.1.1
-      modern-screenshot: 4.6.6
+      modern-screenshot: 4.6.8
       nanoid: 5.1.6
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
