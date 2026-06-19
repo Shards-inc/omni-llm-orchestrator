@@ -89,7 +89,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "add": "^2.0.6",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.31.9",
+    "drizzle-kit": "^0.31.10",
     "esbuild": "^0.25.12",
     "pnpm": "^10.28.2",
     "postcss": "^8.5.8",
